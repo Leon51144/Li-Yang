@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="國立臺北科技大學 - 培育優秀工程與技術人才的頂尖學府" />
+  <title>國立臺北科技大學 - National Taipei University of Technology</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=LXGW+WenKai+Mono+TC&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="container">
+      <div class="top-bar-links">
+        <a href="#">在學學生</a>
+        <a href="#">學生家長</a>
+        <a href="#">教師職員</a>
+        <a href="#">畢業校友</a>
+        <a href="#">來賓訪客</a>
+      </div>
+      <div class="top-bar-right">
+        <a href="#" class="lang-btn">English</a>
+        <a href="#" class="search-btn" id="searchToggle">🔍 搜尋</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar" id="searchBar">
+    <div class="container">
+      <input type="text" id="searchInput" placeholder="請輸入搜尋關鍵字..." />
+      <button id="searchSubmit">搜尋</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header" id="mainHeader">
+    <div class="container">
+      <div class="logo">
+        <a href="#" class="logo-link">
+          <img src="images/school-emblem.png" alt="國立臺北科技大學校徽" class="logo-emblem" />
+          <div class="logo-text">
+            <span class="logo-cn">國立臺北科技大學</span>
+            <span class="logo-en">National Taipei University of Technology</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li class="nav-item has-dropdown">
+            <a href="#" class="nav-link">認識臺北科大</a>
+            <div class="dropdown">
+              <a href="#">北科大簡介</a>
+              <a href="#">校長室</a>
+              <a href="#">校訓・校徽・校歌</a>
+              <a href="#">校史館</a>
+              <a href="#">交通指引</a>
+              <a href="#">校園地圖</a>
+            </div>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="#" class="nav-link">招生資訊</a>
+            <div class="dropdown">
+              <a href="#">招生資訊</a>
+              <a href="#">推廣教育</a>
+              <a href="#">華語文中心</a>
+            </div>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="#" class="nav-link">教學資源</a>
+            <div class="dropdown">
+              <a href="#">教學單位</a>
+              <a href="#">高等教育深耕計畫</a>
+              <a href="#">跨域學習專區</a>
+              <a href="#">前瞻技術研究總部</a>
+            </div>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="#" class="nav-link">行政服務</a>
+            <div class="dropdown">
+              <a href="#">行政單位</a>
+              <a href="#">圖書館</a>
+              <a href="#">助學與學雜費</a>
+              <a href="#">獎助學金</a>
+            </div>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="#" class="nav-link">研發合作</a>
+            <div class="dropdown">
+              <a href="#">研究發展處</a>
+              <a href="#">產學合作處</a>
+              <a href="#">專利暨技轉中心</a>
+            </div>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="#" class="nav-link">資訊服務</a>
+            <div class="dropdown">
+              <a href="#">校園入口</a>
+              <a href="#">Web Mail</a>
+              <a href="#">北科軟體雲</a>
+              <a href="#">課程系統查詢</a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+
+      <button class="hamburger" id="hamburger" aria-label="開啟選單">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Carousel -->
+  <section class="hero" aria-label="首頁輪播">
+    <div class="carousel" id="carousel">
+      <div class="carousel-track" id="carouselTrack">
+        <div class="carousel-slide" style="background: linear-gradient(135deg, #003087 0%, #0056c7 50%, #0080ff 100%);">
+          <div class="slide-content">
+            <span class="slide-tag">創新・卓越・永續</span>
+            <h1>培育世界級<br/>工程技術人才</h1>
+            <p>百年學府，與產業共創未來，成就每一位學生的無限可能</p>
+            <div class="slide-btns">
+              <a href="#" class="btn btn-primary">了解更多</a>
+              <a href="#" class="btn btn-outline">招生資訊</a>
+            </div>
+          </div>
+          <div class="slide-visual">
+            <div class="slide-circle c1"></div>
+            <div class="slide-circle c2"></div>
+            <div class="slide-circle c3"></div>
+            <div class="slide-stats">
+              <div class="stat"><span class="stat-num">113</span><span class="stat-label">年創立</span></div>
+              <div class="stat"><span class="stat-num">15,000+</span><span class="stat-label">在學學生</span></div>
+              <div class="stat"><span class="stat-num">TOP 3</span><span class="stat-label">技職院校</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-slide" style="background: linear-gradient(135deg, #1a0050 0%, #4a0080 50%, #7c00c8 100%);">
+          <div class="slide-content">
+            <span class="slide-tag">研究・創新</span>
+            <h1>前瞻技術<br/>引領產業未來</h1>
+            <p>結合學術研究與產業需求，打造下一個世代的科技創新基地</p>
+            <div class="slide-btns">
+              <a href="#" class="btn btn-primary">研發成果</a>
+              <a href="#" class="btn btn-outline">產學合作</a>
+            </div>
+          </div>
+          <div class="slide-visual">
+            <div class="slide-circle c1"></div>
+            <div class="slide-circle c2"></div>
+            <div class="slide-circle c3"></div>
+            <div class="slide-stats">
+              <div class="stat"><span class="stat-num">500+</span><span class="stat-label">研究計畫</span></div>
+              <div class="stat"><span class="stat-num">800+</span><span class="stat-label">專利數量</span></div>
+              <div class="stat"><span class="stat-num">1B+</span><span class="stat-label">研究經費</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-slide" style="background: linear-gradient(135deg, #003d2b 0%, #006644 50%, #00a86b 100%);">
+          <div class="slide-content">
+            <span class="slide-tag">永續・綠色校園</span>
+            <h1>打造永續綠色<br/>智慧校園</h1>
+            <p>落實SDGs目標，建構環境友善、節能減碳的未來校園典範</p>
+            <div class="slide-btns">
+              <a href="#" class="btn btn-primary">永續報告</a>
+              <a href="#" class="btn btn-outline">校園環境</a>
+            </div>
+          </div>
+          <div class="slide-visual">
+            <div class="slide-circle c1"></div>
+            <div class="slide-circle c2"></div>
+            <div class="slide-circle c3"></div>
+            <div class="slide-stats">
+              <div class="stat"><span class="stat-num">碳中和</span><span class="stat-label">2030目標</span></div>
+              <div class="stat"><span class="stat-num">100%</span><span class="stat-label">再生能源</span></div>
+              <div class="stat"><span class="stat-num">GREEN</span><span class="stat-label">認證校園</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="carousel-btn prev" id="prevBtn" aria-label="上一張">&#8249;</button>
+      <button class="carousel-btn next" id="nextBtn" aria-label="下一張">&#8250;</button>
+
+      <div class="carousel-dots" id="carouselDots">
+        <button class="dot active" data-index="0" aria-label="第1張"></button>
+        <button class="dot" data-index="1" aria-label="第2張"></button>
+        <button class="dot" data-index="2" aria-label="第3張"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Links -->
+  <section class="quick-links">
+    <div class="container">
+      <div class="quick-links-grid">
+        <a href="#" class="quick-link-card" id="ql-student">
+          <div class="ql-icon">🎓</div>
+          <span class="ql-title">在學學生</span>
+          <span class="ql-desc">課程、成績、選課系統</span>
+        </a>
+        <a href="#" class="quick-link-card" id="ql-parent">
+          <div class="ql-icon">👨‍👩‍👧</div>
+          <span class="ql-title">學生家長</span>
+          <span class="ql-desc">學生生活、獎助學金</span>
+        </a>
+        <a href="#" class="quick-link-card" id="ql-staff">
+          <div class="ql-icon">👩‍🏫</div>
+          <span class="ql-title">教師職員</span>
+          <span class="ql-desc">行政系統、教學資源</span>
+        </a>
+        <a href="#" class="quick-link-card" id="ql-alumni">
+          <div class="ql-icon">🌐</div>
+          <span class="ql-title">畢業校友</span>
+          <span class="ql-desc">校友網絡、回饋母校</span>
+        </a>
+        <a href="#" class="quick-link-card" id="ql-visitor">
+          <div class="ql-icon">🏛️</div>
+          <span class="ql-title">來賓訪客</span>
+          <span class="ql-desc">校園參訪、合作洽談</span>
+        </a>
+        <a href="#" class="quick-link-card" id="ql-recruit">
+          <div class="ql-icon">📋</div>
+          <span class="ql-title">招生資訊</span>
+          <span class="ql-desc">入學管道、考試資訊</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <div class="content-grid">
+
+        <!-- News Section -->
+        <section class="news-section">
+          <div class="section-header">
+            <h2 class="section-title">最新消息</h2>
+            <div class="section-tabs">
+              <button class="tab-btn active" data-tab="all" id="tab-all">全部</button>
+              <button class="tab-btn" data-tab="news" id="tab-news">公告</button>
+              <button class="tab-btn" data-tab="event" id="tab-event">活動</button>
+              <button class="tab-btn" data-tab="academic" id="tab-academic">學術</button>
+            </div>
+          </div>
+          <ul class="news-list" id="newsList">
+            <li class="news-item" data-type="news">
+              <span class="news-tag tag-news">公告</span>
+              <a href="#" class="news-title">【重要】114學年度第一學期選課作業時程公告</a>
+              <span class="news-date">2026-04-28</span>
+            </li>
+            <li class="news-item" data-type="event">
+              <span class="news-tag tag-event">活動</span>
+              <a href="#" class="news-title">115年全校運動大會暨系際盃報名開始</a>
+              <span class="news-date">2026-04-25</span>
+            </li>
+            <li class="news-item" data-type="academic">
+              <span class="news-tag tag-academic">學術</span>
+              <a href="#" class="news-title">北科大研究團隊於頂尖期刊發表AI晶片突破性研究</a>
+              <span class="news-date">2026-04-22</span>
+            </li>
+            <li class="news-item" data-type="news">
+              <span class="news-tag tag-news">公告</span>
+              <a href="#" class="news-title">114學年度畢業典禮相關事項說明</a>
+              <span class="news-date">2026-04-20</span>
+            </li>
+            <li class="news-item" data-type="event">
+              <span class="news-tag tag-event">活動</span>
+              <a href="#" class="news-title">創業競賽「北科創業家」報名截止日延至5月15日</a>
+              <span class="news-date">2026-04-18</span>
+            </li>
+            <li class="news-item" data-type="academic">
+              <span class="news-tag tag-academic">學術</span>
+              <a href="#" class="news-title">2026國際技術交流研討會－智慧製造與永續發展</a>
+              <span class="news-date">2026-04-15</span>
+            </li>
+            <li class="news-item" data-type="news">
+              <span class="news-tag tag-news">公告</span>
+              <a href="#" class="news-title">校園網路系統維護公告（5月3日凌晨2:00-6:00）</a>
+              <span class="news-date">2026-04-12</span>
+            </li>
+          </ul>
+          <a href="#" class="more-link">查看更多 →</a>
+        </section>
+
+        <!-- Side Panel -->
+        <aside class="side-panel">
+
+          <!-- Events -->
+          <div class="side-card">
+            <h3 class="side-title">行事曆</h3>
+            <div class="calendar-mini">
+              <div class="cal-header">
+                <button id="calPrev">‹</button>
+                <span id="calMonthYear">2026年4月</span>
+                <button id="calNext">›</button>
+              </div>
+              <div class="cal-grid">
+                <div class="cal-day-name">日</div><div class="cal-day-name">一</div>
+                <div class="cal-day-name">二</div><div class="cal-day-name">三</div>
+                <div class="cal-day-name">四</div><div class="cal-day-name">五</div>
+                <div class="cal-day-name">六</div>
+              </div>
+              <div class="cal-days" id="calDays"></div>
+            </div>
+          </div>
+
+          <!-- Info System Links -->
+          <div class="side-card">
+            <h3 class="side-title">資訊系統</h3>
+            <div class="info-links">
+              <a href="#" class="info-link-item" id="il-portal">
+                <span class="il-icon">🏠</span>
+                <span>校園入口網</span>
+                <span class="il-arrow">→</span>
+              </a>
+              <a href="#" class="info-link-item" id="il-mail">
+                <span class="il-icon">📧</span>
+                <span>Web Mail</span>
+                <span class="il-arrow">→</span>
+              </a>
+              <a href="#" class="info-link-item" id="il-cloud">
+                <span class="il-icon">☁️</span>
+                <span>北科軟體雲</span>
+                <span class="il-arrow">→</span>
+              </a>
+              <a href="#" class="info-link-item" id="il-course">
+                <span class="il-icon">📚</span>
+                <span>課程系統查詢</span>
+                <span class="il-arrow">→</span>
+              </a>
+              <a href="#" class="info-link-item" id="il-transcript">
+                <span class="il-icon">📄</span>
+                <span>線上成績單申請</span>
+                <span class="il-arrow">→</span>
+              </a>
+              <a href="#" class="info-link-item" id="il-vpn">
+                <span class="il-icon">🔒</span>
+                <span>VPN連線服務</span>
+                <span class="il-arrow">→</span>
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- Highlights / Feature Cards -->
+  <section class="highlights">
+    <div class="container">
+      <div class="section-header centered">
+        <h2 class="section-title">北科大特色</h2>
+        <p class="section-subtitle">在實踐中學習，於創新中突破</p>
+      </div>
+      <div class="highlights-grid">
+        <div class="highlight-card" id="hc-research">
+          <div class="hc-icon">🔬</div>
+          <h3>頂尖研究</h3>
+          <p>擁有多個國際頂尖研究中心，年均研究經費超過十億元，持續推動跨領域創新研究。</p>
+          <a href="#" class="hc-link">探索研究成果 →</a>
+        </div>
+        <div class="highlight-card" id="hc-industry">
+          <div class="hc-icon">🏭</div>
+          <h3>產學合作</h3>
+          <p>與超過500家企業建立深度合作關係，提供學生豐富的實習與就業機會，就業率高達98%。</p>
+          <a href="#" class="hc-link">了解合作模式 →</a>
+        </div>
+        <div class="highlight-card" id="hc-international">
+          <div class="hc-icon">🌏</div>
+          <h3>國際交流</h3>
+          <p>與全球70多個國家超過300所大學締結姐妹校，提供多元的國際移動與交換機會。</p>
+          <a href="#" class="hc-link">探索國際機會 →</a>
+        </div>
+        <div class="highlight-card" id="hc-innovation">
+          <div class="hc-icon">💡</div>
+          <h3>創新創業</h3>
+          <p>設立創業育成中心，輔導學生與新創團隊，每年孵化超過50個具商業潛力的新創項目。</p>
+          <a href="#" class="hc-link">了解創業資源 →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="footer-logo">
+              <img src="images/school-emblem.png" alt="國立臺北科技大學校徽" class="footer-emblem" />
+            </div>
+            <p class="footer-name-cn">國立臺北科技大學</p>
+            <p class="footer-name-en">National Taipei University of Technology</p>
+            <p class="footer-addr">10608 臺北市大安區忠孝東路三段1號</p>
+            <p class="footer-tel">電話：(02) 2771-2171</p>
+            <div class="footer-social">
+              <a href="#" class="social-btn" id="fb-link" aria-label="Facebook">f</a>
+              <a href="#" class="social-btn" id="yt-link" aria-label="YouTube">▶</a>
+              <a href="#" class="social-btn" id="ig-link" aria-label="Instagram">◎</a>
+            </div>
+          </div>
+
+          <div class="footer-col">
+            <h4>認識北科大</h4>
+            <ul>
+              <li><a href="#">北科大簡介</a></li>
+              <li><a href="#">校長室</a></li>
+              <li><a href="#">校訓・校徽・校歌</a></li>
+              <li><a href="#">校史館</a></li>
+              <li><a href="#">組織規程</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>學術資源</h4>
+            <ul>
+              <li><a href="#">教學單位</a></li>
+              <li><a href="#">圖書館</a></li>
+              <li><a href="#">跨域學習</a></li>
+              <li><a href="#">研究發展處</a></li>
+              <li><a href="#">前瞻技術總部</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>服務資訊</h4>
+            <ul>
+              <li><a href="#">招生資訊</a></li>
+              <li><a href="#">助學與學雜費</a></li>
+              <li><a href="#">獎助學金</a></li>
+              <li><a href="#">緊急聯絡電話</a></li>
+              <li><a href="#">隱私權政策</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>© 2026 國立臺北科技大學 National Taipei University of Technology. All Rights Reserved.</p>
+        <div class="footer-bottom-links">
+          <a href="#">網站導覽</a>
+          <a href="#">隱私權政策</a>
+          <a href="#">資訊安全政策</a>
+          <a href="#">首頁問題回報</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" id="backToTop" aria-label="回到頂部">↑</button>
+
+  <script src="script.js"></script>
+</body>
+</html>

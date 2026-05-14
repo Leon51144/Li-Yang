@@ -3,464 +3,679 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="國立臺北科技大學 - 培育優秀工程與技術人才的頂尖學府" />
-  <title>國立臺北科技大學 - National Taipei University of Technology</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=LXGW+WenKai+Mono+TC&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <title>蜜蜂授粉遊戲</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── 遊戲主容器 ── */
+    #game {
+      position: relative;
+      width: 900px;
+      height: 506px;
+      overflow: hidden;
+    }
+
+    /* ── 背景 ── */
+    #bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    /* 如果bg.png不存在，用漸層代替 */
+    #game.no-bg {
+      background: linear-gradient(
+        180deg,
+        #a8dce8 0%,
+        #b8e6d0 45%,
+        #7ec87a 75%,
+        #5aab56 100%
+      );
+    }
+
+    /* ── 所有精靈 (sprite) 共用 ── */
+    .sprite {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── 裝飾元素（位置由 JS 控制，無浮動動畫） ── */
+    #berry     { width: 60px; z-index: 3; }
+    #dragonfly { width: 72px; z-index: 3; }
+    #bird      { width: 70px; z-index: 3; }
+    #mangosteen{ width: 60px; z-index: 3; }
+    #scallion  { width: 55px; z-index: 3; }
+    #pepper    { width: 55px; z-index: 3; }
+
+    /* ── 二朵花（目標），位置由 JS 控制 ── */
+    #flower-pink {
+      width: 80px;
+      z-index: 4;
+      transition: transform 0.25s;
+    }
+    #flower-red {
+      width: 80px;
+      z-index: 4;
+      transition: transform 0.25s;
+    }
+
+    /* ── OK 標記 ── */
+    .ok-img {
+      width: 50px;
+      z-index: 6;
+      display: none;
+      pointer-events: none;
+    }
+
+    /* 花被授粉時的效果 */
+    .pollinated {
+      animation: popFlower 0.5s ease;
+    }
+
+    /* ── 蜜蜂（玩家） ── */
+    #bee-wrap {
+      position: absolute;
+      width: 65px;
+      height: 65px;
+      left: 30px;
+      top: 220px;
+      z-index: 10;
+    }
+
+    #bee-inner {
+      width: 100%;
+      height: 100%;
+    }
+
+    #bee-inner img {
+      pointer-events: none;
+      user-select: none;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+
+
+    /* ── 方向鍵（左下角，十字排列，獨立區塊） ── */
+    #arrows {
+      position: absolute;
+      bottom: 18px;
+      left: 18px;
+      z-index: 20;
+      width: 132px;
+      height: 132px;
+      display: grid;
+      grid-template-columns: 44px 44px 44px;
+      grid-template-rows: 44px 44px 44px;
+      grid-template-areas:
+        ".    up   ."
+        "left .    right"
+        ".    down .";
+    }
+
+    .arr-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    .arr-btn:active  { transform: scale(0.82); opacity: 0.75; }
+    .arr-btn:hover   { opacity: 0.85; }
+
+    .arr-btn img {
+      width: 38px;
+      height: 38px;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
+    }
+
+    #btn-up    { grid-area: up;    }
+    #btn-left  { grid-area: left;  }
+    #btn-right { grid-area: right; }
+    #btn-down  { grid-area: down;  }
+
+    /* 旋轉箭頭方向 */
+    #btn-up    img { transform: rotate(-90deg); }
+    #btn-left  img { transform: rotate(180deg); }
+    #btn-down  img { transform: rotate(90deg);  }
+
+    /* ── 勝利畫面 ── */
+    #win {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.5);
+      z-index: 50;
+      gap: 14px;
+    }
+    #win h1 {
+      font-family: Arial, sans-serif;
+      font-size: 52px;
+      color: #ffe066;
+      text-shadow: 0 3px 16px rgba(0,0,0,0.5);
+      animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    #win p  { font-family: Arial, sans-serif; font-size: 20px; color: #fff; }
+    #btn-restart {
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 10px 32px;
+      background: linear-gradient(135deg, #fdd835, #f5a623);
+      color: #fff;
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(245,166,35,0.5);
+      transition: transform 0.1s;
+    }
+    #btn-restart:hover { transform: scale(1.05); }
+
+    /* ── Animations ── */
+    @keyframes popFlower {
+      0%   { transform: scale(1); }
+      35%  { transform: scale(1.35); filter: brightness(1.7) saturate(1.8); }
+      65%  { transform: scale(0.9); }
+      100% { transform: scale(1); filter: none; }
+    }
+    @keyframes popIn {
+      from { transform: scale(0.3); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+  </style>
 </head>
 <body>
+<div id="game">
 
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <div class="container">
-      <div class="top-bar-links">
-        <a href="#">在學學生</a>
-        <a href="#">學生家長</a>
-        <a href="#">教師職員</a>
-        <a href="#">畢業校友</a>
-        <a href="#">來賓訪客</a>
-      </div>
-      <div class="top-bar-right">
-        <a href="#" class="lang-btn">English</a>
-        <a href="#" class="search-btn" id="searchToggle">🔍 搜尋</a>
-      </div>
+  <!-- ── 音效 ── -->
+  <audio id="snd-click" src="click.mp3"   preload="auto"></audio>
+  <audio id="snd-error" src="errorse.mp3" preload="auto"></audio>
+  <audio id="snd-right" src="rightse.mp3" preload="auto"></audio>
+  <audio id="snd-win"   src="winse.mp3"   preload="auto"></audio>
+
+  <!-- 背景圖 -->
+  <img id="bg" src="bg.png" alt="背景"
+    onerror="document.getElementById('game').classList.add('no-bg'); this.style.display='none';" />
+
+  <!-- ── 裝飾性物件（位置由 JS 隨機設定） ── -->
+  <img class="sprite" id="dragonfly"  src="dragonfly.png"   alt="蜻蜓"   />
+  <img class="sprite" id="bird"       src="Bird.png"        alt="鳥"     />
+
+  <!-- 速度加成（吃到變快） -->
+  <img class="sprite" id="berry"      src="berry.png"        alt="草莓"   />
+  <img class="sprite" id="mangosteen" src="Mangosteen-3.png" alt="山竹"   />
+
+  <!-- 速度懲罰（吃到變慢） -->
+  <img class="sprite" id="scallion"   src="scallion.png"     alt="蔥"     />
+  <img class="sprite" id="pepper"     src="pepper.png"       alt="辣椒"   />
+
+  <!-- ── 兩朵花（授粉目標，位置由 JS 隨機設定） ── -->
+  <img class="sprite" id="flower-pink" src="flower1.png"  alt="粉花" />
+  <img class="sprite" id="flower-red"  src="Flower-4.png" alt="紅花" />
+
+  <!-- ── OK 標記 ── -->
+  <img class="sprite ok-img" id="ok-pink" src="ok.png" alt="OK" />
+  <img class="sprite ok-img" id="ok-red"  src="ok.png" alt="OK" />
+
+  <!-- ── 蜜蜂（玩家） ── -->
+  <div id="bee-wrap">
+    <div id="bee-inner">
+      <img src="bee.png" alt="蜜蜂" id="bee-img" />
     </div>
   </div>
 
-  <!-- Search Bar -->
-  <div class="search-bar" id="searchBar">
-    <div class="container">
-      <input type="text" id="searchInput" placeholder="請輸入搜尋關鍵字..." />
-      <button id="searchSubmit">搜尋</button>
-    </div>
+
+  <!-- ── 方向鍵（十字排列，左下角獨立） ── -->
+  <div id="arrows">
+    <button class="arr-btn" id="btn-up"    title="上" onclick="playSound('click'); move(0,-1)">
+      <img src="arrow.png" alt="上" />
+    </button>
+    <button class="arr-btn" id="btn-left"  title="左" onclick="playSound('click'); move(-1,0)">
+      <img src="arrow.png" alt="左" />
+    </button>
+    <button class="arr-btn" id="btn-right" title="右" onclick="playSound('click'); move(1,0)">
+      <img src="arrow.png" alt="右" />
+    </button>
+    <button class="arr-btn" id="btn-down"  title="下" onclick="playSound('click'); move(0,1)">
+      <img src="arrow.png" alt="下" />
+    </button>
   </div>
 
-  <!-- Header -->
-  <header class="header" id="mainHeader">
-    <div class="container">
-      <div class="logo">
-        <a href="#" class="logo-link">
-          <img src="images/school-emblem.png" alt="國立臺北科技大學校徽" class="logo-emblem" />
-          <div class="logo-text">
-            <span class="logo-cn">國立臺北科技大學</span>
-            <span class="logo-en">National Taipei University of Technology</span>
-          </div>
-        </a>
-      </div>
+  <!-- ── 勝利畫面 ── -->
+  <div id="win">
+    <h1>🎉 成功授粉！</h1>
+    <p id="win-msg">蜜蜂完成了授粉任務！</p>
+    <button id="btn-restart" onclick="restart()">再玩一次 🐝</button>
+  </div>
 
-      <nav class="nav" id="mainNav">
-        <ul class="nav-list">
-          <li class="nav-item has-dropdown">
-            <a href="#" class="nav-link">認識臺北科大</a>
-            <div class="dropdown">
-              <a href="#">北科大簡介</a>
-              <a href="#">校長室</a>
-              <a href="#">校訓・校徽・校歌</a>
-              <a href="#">校史館</a>
-              <a href="#">交通指引</a>
-              <a href="#">校園地圖</a>
-            </div>
-          </li>
-          <li class="nav-item has-dropdown">
-            <a href="#" class="nav-link">招生資訊</a>
-            <div class="dropdown">
-              <a href="#">招生資訊</a>
-              <a href="#">推廣教育</a>
-              <a href="#">華語文中心</a>
-            </div>
-          </li>
-          <li class="nav-item has-dropdown">
-            <a href="#" class="nav-link">教學資源</a>
-            <div class="dropdown">
-              <a href="#">教學單位</a>
-              <a href="#">高等教育深耕計畫</a>
-              <a href="#">跨域學習專區</a>
-              <a href="#">前瞻技術研究總部</a>
-            </div>
-          </li>
-          <li class="nav-item has-dropdown">
-            <a href="#" class="nav-link">行政服務</a>
-            <div class="dropdown">
-              <a href="#">行政單位</a>
-              <a href="#">圖書館</a>
-              <a href="#">助學與學雜費</a>
-              <a href="#">獎助學金</a>
-            </div>
-          </li>
-          <li class="nav-item has-dropdown">
-            <a href="#" class="nav-link">研發合作</a>
-            <div class="dropdown">
-              <a href="#">研究發展處</a>
-              <a href="#">產學合作處</a>
-              <a href="#">專利暨技轉中心</a>
-            </div>
-          </li>
-          <li class="nav-item has-dropdown">
-            <a href="#" class="nav-link">資訊服務</a>
-            <div class="dropdown">
-              <a href="#">校園入口</a>
-              <a href="#">Web Mail</a>
-              <a href="#">北科軟體雲</a>
-              <a href="#">課程系統查詢</a>
-            </div>
-          </li>
-        </ul>
-      </nav>
+</div>
 
-      <button class="hamburger" id="hamburger" aria-label="開啟選單">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </header>
+<script>
+/* =========================================================
+   GAME CONFIG
+   ========================================================= */
+const GW   = 900;   // game width
+const GH   = 506;   // game height
+const BEES = 65;    // bee sprite size
+const BASE_STEP = 20;    // base pixels per move
 
-  <!-- Hero Carousel -->
-  <section class="hero" aria-label="首頁輪播">
-    <div class="carousel" id="carousel">
-      <div class="carousel-track" id="carouselTrack">
-        <div class="carousel-slide" style="background: linear-gradient(135deg, #003087 0%, #0056c7 50%, #0080ff 100%);">
-          <div class="slide-content">
-            <span class="slide-tag">創新・卓越・永續</span>
-            <h1>培育世界級<br/>工程技術人才</h1>
-            <p>百年學府，與產業共創未來，成就每一位學生的無限可能</p>
-            <div class="slide-btns">
-              <a href="#" class="btn btn-primary">了解更多</a>
-              <a href="#" class="btn btn-outline">招生資訊</a>
-            </div>
-          </div>
-          <div class="slide-visual">
-            <div class="slide-circle c1"></div>
-            <div class="slide-circle c2"></div>
-            <div class="slide-circle c3"></div>
-            <div class="slide-stats">
-              <div class="stat"><span class="stat-num">113</span><span class="stat-label">年創立</span></div>
-              <div class="stat"><span class="stat-num">15,000+</span><span class="stat-label">在學學生</span></div>
-              <div class="stat"><span class="stat-num">TOP 3</span><span class="stat-label">技職院校</span></div>
-            </div>
-          </div>
-        </div>
+// Speed modifiers
+const SPEED_NORMAL = 1.0;
+const SPEED_SLOW   = 0.45;
+const SPEED_FAST   = 1.35;
+const SPEED_DURATION = 5000;  // ms duration for speed effect
 
-        <div class="carousel-slide" style="background: linear-gradient(135deg, #1a0050 0%, #4a0080 50%, #7c00c8 100%);">
-          <div class="slide-content">
-            <span class="slide-tag">研究・創新</span>
-            <h1>前瞻技術<br/>引領產業未來</h1>
-            <p>結合學術研究與產業需求，打造下一個世代的科技創新基地</p>
-            <div class="slide-btns">
-              <a href="#" class="btn btn-primary">研發成果</a>
-              <a href="#" class="btn btn-outline">產學合作</a>
-            </div>
-          </div>
-          <div class="slide-visual">
-            <div class="slide-circle c1"></div>
-            <div class="slide-circle c2"></div>
-            <div class="slide-circle c3"></div>
-            <div class="slide-stats">
-              <div class="stat"><span class="stat-num">500+</span><span class="stat-label">研究計畫</span></div>
-              <div class="stat"><span class="stat-num">800+</span><span class="stat-label">專利數量</span></div>
-              <div class="stat"><span class="stat-num">1B+</span><span class="stat-label">研究經費</span></div>
-            </div>
-          </div>
-        </div>
+// Flower size
+const FLOWER_W = 80;
+const FLOWER_H = 80;
 
-        <div class="carousel-slide" style="background: linear-gradient(135deg, #003d2b 0%, #006644 50%, #00a86b 100%);">
-          <div class="slide-content">
-            <span class="slide-tag">永續・綠色校園</span>
-            <h1>打造永續綠色<br/>智慧校園</h1>
-            <p>落實SDGs目標，建構環境友善、節能減碳的未來校園典範</p>
-            <div class="slide-btns">
-              <a href="#" class="btn btn-primary">永續報告</a>
-              <a href="#" class="btn btn-outline">校園環境</a>
-            </div>
-          </div>
-          <div class="slide-visual">
-            <div class="slide-circle c1"></div>
-            <div class="slide-circle c2"></div>
-            <div class="slide-circle c3"></div>
-            <div class="slide-stats">
-              <div class="stat"><span class="stat-num">碳中和</span><span class="stat-label">2030目標</span></div>
-              <div class="stat"><span class="stat-num">100%</span><span class="stat-label">再生能源</span></div>
-              <div class="stat"><span class="stat-num">GREEN</span><span class="stat-label">認證校園</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
+// Decorative/obstacle sizes (approximate)
+const ITEM_SIZE = 65;
 
-      <button class="carousel-btn prev" id="prevBtn" aria-label="上一張">&#8249;</button>
-      <button class="carousel-btn next" id="nextBtn" aria-label="下一張">&#8250;</button>
+// Forbidden zone for bee start (left side)
+const BEE_START_X = 30;
+const BEE_START_Y = GH / 2 - BEES / 2;
 
-      <div class="carousel-dots" id="carouselDots">
-        <button class="dot active" data-index="0" aria-label="第1張"></button>
-        <button class="dot" data-index="1" aria-label="第2張"></button>
-        <button class="dot" data-index="2" aria-label="第3張"></button>
-      </div>
-    </div>
-  </section>
+// Hit radii
+const HIT_R        = 60;  // flower collision radius
+const ANIMAL_HIT_R = 42;  // obstacle/powerup collision radius
 
-  <!-- Quick Links -->
-  <section class="quick-links">
-    <div class="container">
-      <div class="quick-links-grid">
-        <a href="#" class="quick-link-card" id="ql-student">
-          <div class="ql-icon">🎓</div>
-          <span class="ql-title">在學學生</span>
-          <span class="ql-desc">課程、成績、選課系統</span>
-        </a>
-        <a href="#" class="quick-link-card" id="ql-parent">
-          <div class="ql-icon">👨‍👩‍👧</div>
-          <span class="ql-title">學生家長</span>
-          <span class="ql-desc">學生生活、獎助學金</span>
-        </a>
-        <a href="#" class="quick-link-card" id="ql-staff">
-          <div class="ql-icon">👩‍🏫</div>
-          <span class="ql-title">教師職員</span>
-          <span class="ql-desc">行政系統、教學資源</span>
-        </a>
-        <a href="#" class="quick-link-card" id="ql-alumni">
-          <div class="ql-icon">🌐</div>
-          <span class="ql-title">畢業校友</span>
-          <span class="ql-desc">校友網絡、回饋母校</span>
-        </a>
-        <a href="#" class="quick-link-card" id="ql-visitor">
-          <div class="ql-icon">🏛️</div>
-          <span class="ql-title">來賓訪客</span>
-          <span class="ql-desc">校園參訪、合作洽談</span>
-        </a>
-        <a href="#" class="quick-link-card" id="ql-recruit">
-          <div class="ql-icon">📋</div>
-          <span class="ql-title">招生資訊</span>
-          <span class="ql-desc">入學管道、考試資訊</span>
-        </a>
-      </div>
-    </div>
-  </section>
+/* =========================================================
+   STATE
+   ========================================================= */
+let bx = BEE_START_X, by = BEE_START_Y;
+let flowerVisited = { pink: false, red: false };
+let won           = false;
+let errorCooldown = false;
+let speedMult     = SPEED_NORMAL;
+let speedTimer    = null;
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="container">
-      <div class="content-grid">
+// Positions for flowers and items (set randomly on init/restart)
+let flowerPos  = { pink: {x:0,y:0}, red: {x:0,y:0} };
+let itemPos    = {};   // keyed by item id
 
-        <!-- News Section -->
-        <section class="news-section">
-          <div class="section-header">
-            <h2 class="section-title">最新消息</h2>
-            <div class="section-tabs">
-              <button class="tab-btn active" data-tab="all" id="tab-all">全部</button>
-              <button class="tab-btn" data-tab="news" id="tab-news">公告</button>
-              <button class="tab-btn" data-tab="event" id="tab-event">活動</button>
-              <button class="tab-btn" data-tab="academic" id="tab-academic">學術</button>
-            </div>
-          </div>
-          <ul class="news-list" id="newsList">
-            <li class="news-item" data-type="news">
-              <span class="news-tag tag-news">公告</span>
-              <a href="#" class="news-title">【重要】114學年度第一學期選課作業時程公告</a>
-              <span class="news-date">2026-04-28</span>
-            </li>
-            <li class="news-item" data-type="event">
-              <span class="news-tag tag-event">活動</span>
-              <a href="#" class="news-title">115年全校運動大會暨系際盃報名開始</a>
-              <span class="news-date">2026-04-25</span>
-            </li>
-            <li class="news-item" data-type="academic">
-              <span class="news-tag tag-academic">學術</span>
-              <a href="#" class="news-title">北科大研究團隊於頂尖期刊發表AI晶片突破性研究</a>
-              <span class="news-date">2026-04-22</span>
-            </li>
-            <li class="news-item" data-type="news">
-              <span class="news-tag tag-news">公告</span>
-              <a href="#" class="news-title">114學年度畢業典禮相關事項說明</a>
-              <span class="news-date">2026-04-20</span>
-            </li>
-            <li class="news-item" data-type="event">
-              <span class="news-tag tag-event">活動</span>
-              <a href="#" class="news-title">創業競賽「北科創業家」報名截止日延至5月15日</a>
-              <span class="news-date">2026-04-18</span>
-            </li>
-            <li class="news-item" data-type="academic">
-              <span class="news-tag tag-academic">學術</span>
-              <a href="#" class="news-title">2026國際技術交流研討會－智慧製造與永續發展</a>
-              <span class="news-date">2026-04-15</span>
-            </li>
-            <li class="news-item" data-type="news">
-              <span class="news-tag tag-news">公告</span>
-              <a href="#" class="news-title">校園網路系統維護公告（5月3日凌晨2:00-6:00）</a>
-              <span class="news-date">2026-04-12</span>
-            </li>
-          </ul>
-          <a href="#" class="more-link">查看更多 →</a>
-        </section>
+/* =========================================================
+   REFS
+   ========================================================= */
+const beeWrap   = document.getElementById('bee-wrap');
+const beeImg    = document.getElementById('bee-img');
+const winEl     = document.getElementById('win');
+const winMsg    = document.getElementById('win-msg');
+const fpink     = document.getElementById('flower-pink');
+const fred      = document.getElementById('flower-red');
+const okPink    = document.getElementById('ok-pink');
+const okRed     = document.getElementById('ok-red');
 
-        <!-- Side Panel -->
-        <aside class="side-panel">
 
-          <!-- Events -->
-          <div class="side-card">
-            <h3 class="side-title">行事曆</h3>
-            <div class="calendar-mini">
-              <div class="cal-header">
-                <button id="calPrev">‹</button>
-                <span id="calMonthYear">2026年4月</span>
-                <button id="calNext">›</button>
-              </div>
-              <div class="cal-grid">
-                <div class="cal-day-name">日</div><div class="cal-day-name">一</div>
-                <div class="cal-day-name">二</div><div class="cal-day-name">三</div>
-                <div class="cal-day-name">四</div><div class="cal-day-name">五</div>
-                <div class="cal-day-name">六</div>
-              </div>
-              <div class="cal-days" id="calDays"></div>
-            </div>
-          </div>
+/* =========================================================
+   RANDOM POSITION HELPERS
+   ========================================================= */
 
-          <!-- Info System Links -->
-          <div class="side-card">
-            <h3 class="side-title">資訊系統</h3>
-            <div class="info-links">
-              <a href="#" class="info-link-item" id="il-portal">
-                <span class="il-icon">🏠</span>
-                <span>校園入口網</span>
-                <span class="il-arrow">→</span>
-              </a>
-              <a href="#" class="info-link-item" id="il-mail">
-                <span class="il-icon">📧</span>
-                <span>Web Mail</span>
-                <span class="il-arrow">→</span>
-              </a>
-              <a href="#" class="info-link-item" id="il-cloud">
-                <span class="il-icon">☁️</span>
-                <span>北科軟體雲</span>
-                <span class="il-arrow">→</span>
-              </a>
-              <a href="#" class="info-link-item" id="il-course">
-                <span class="il-icon">📚</span>
-                <span>課程系統查詢</span>
-                <span class="il-arrow">→</span>
-              </a>
-              <a href="#" class="info-link-item" id="il-transcript">
-                <span class="il-icon">📄</span>
-                <span>線上成績單申請</span>
-                <span class="il-arrow">→</span>
-              </a>
-              <a href="#" class="info-link-item" id="il-vpn">
-                <span class="il-icon">🔒</span>
-                <span>VPN連線服務</span>
-                <span class="il-arrow">→</span>
-              </a>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </main>
+/**
+ * Returns a random integer in [min, max].
+ */
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-  <!-- Highlights / Feature Cards -->
-  <section class="highlights">
-    <div class="container">
-      <div class="section-header centered">
-        <h2 class="section-title">北科大特色</h2>
-        <p class="section-subtitle">在實踐中學習，於創新中突破</p>
-      </div>
-      <div class="highlights-grid">
-        <div class="highlight-card" id="hc-research">
-          <div class="hc-icon">🔬</div>
-          <h3>頂尖研究</h3>
-          <p>擁有多個國際頂尖研究中心，年均研究經費超過十億元，持續推動跨領域創新研究。</p>
-          <a href="#" class="hc-link">探索研究成果 →</a>
-        </div>
-        <div class="highlight-card" id="hc-industry">
-          <div class="hc-icon">🏭</div>
-          <h3>產學合作</h3>
-          <p>與超過500家企業建立深度合作關係，提供學生豐富的實習與就業機會，就業率高達98%。</p>
-          <a href="#" class="hc-link">了解合作模式 →</a>
-        </div>
-        <div class="highlight-card" id="hc-international">
-          <div class="hc-icon">🌏</div>
-          <h3>國際交流</h3>
-          <p>與全球70多個國家超過300所大學締結姐妹校，提供多元的國際移動與交換機會。</p>
-          <a href="#" class="hc-link">探索國際機會 →</a>
-        </div>
-        <div class="highlight-card" id="hc-innovation">
-          <div class="hc-icon">💡</div>
-          <h3>創新創業</h3>
-          <p>設立創業育成中心，輔導學生與新創團隊，每年孵化超過50個具商業潛力的新創項目。</p>
-          <a href="#" class="hc-link">了解創業資源 →</a>
-        </div>
-      </div>
-    </div>
-  </section>
+/**
+ * Check if two rectangles (with some padding) overlap.
+ * a, b: {x, y, w, h}
+ * pad: minimum gap between them
+ */
+function rectsOverlap(a, b, pad = 30) {
+  return !(
+    a.x + a.w + pad < b.x ||
+    b.x + b.w + pad < a.x ||
+    a.y + a.h + pad < b.y ||
+    b.y + b.h + pad < a.y
+  );
+}
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-top">
-      <div class="container">
-        <div class="footer-grid">
-          <div class="footer-brand">
-            <div class="footer-logo">
-              <img src="images/school-emblem.png" alt="國立臺北科技大學校徽" class="footer-emblem" />
-            </div>
-            <p class="footer-name-cn">國立臺北科技大學</p>
-            <p class="footer-name-en">National Taipei University of Technology</p>
-            <p class="footer-addr">10608 臺北市大安區忠孝東路三段1號</p>
-            <p class="footer-tel">電話：(02) 2771-2171</p>
-            <div class="footer-social">
-              <a href="#" class="social-btn" id="fb-link" aria-label="Facebook">f</a>
-              <a href="#" class="social-btn" id="yt-link" aria-label="YouTube">▶</a>
-              <a href="#" class="social-btn" id="ig-link" aria-label="Instagram">◎</a>
-            </div>
-          </div>
+/**
+ * Place all random items without overlapping each other or the bee start area.
+ * Returns { pink, red, berry, mangosteen, scallion, pepper, dragonfly, bird }
+ *   each with { x, y, w, h }
+ */
+function randomizePositions() {
+  const margin = 10;
+  // Exclude left 120px (bee start zone + arrow pad) and bottom 160px (arrows)
+  const xMin = 120, xMax = GW - ITEM_SIZE - margin;
+  const yMin = margin, yMax = GH - ITEM_SIZE - 160;
 
-          <div class="footer-col">
-            <h4>認識北科大</h4>
-            <ul>
-              <li><a href="#">北科大簡介</a></li>
-              <li><a href="#">校長室</a></li>
-              <li><a href="#">校訓・校徽・校歌</a></li>
-              <li><a href="#">校史館</a></li>
-              <li><a href="#">組織規程</a></li>
-            </ul>
-          </div>
+  const placed = [];
 
-          <div class="footer-col">
-            <h4>學術資源</h4>
-            <ul>
-              <li><a href="#">教學單位</a></li>
-              <li><a href="#">圖書館</a></li>
-              <li><a href="#">跨域學習</a></li>
-              <li><a href="#">研究發展處</a></li>
-              <li><a href="#">前瞻技術總部</a></li>
-            </ul>
-          </div>
+  // Bee start zone as a forbidden rect
+  placed.push({ x: 0, y: 0, w: 130, h: GH });
 
-          <div class="footer-col">
-            <h4>服務資訊</h4>
-            <ul>
-              <li><a href="#">招生資訊</a></li>
-              <li><a href="#">助學與學雜費</a></li>
-              <li><a href="#">獎助學金</a></li>
-              <li><a href="#">緊急聯絡電話</a></li>
-              <li><a href="#">隱私權政策</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div class="container">
-        <p>© 2026 國立臺北科技大學 National Taipei University of Technology. All Rights Reserved.</p>
-        <div class="footer-bottom-links">
-          <a href="#">網站導覽</a>
-          <a href="#">隱私權政策</a>
-          <a href="#">資訊安全政策</a>
-          <a href="#">首頁問題回報</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+  function placeItem(w, h, attempts = 200) {
+    for (let i = 0; i < attempts; i++) {
+      const x = randInt(xMin, xMax);
+      const y = randInt(yMin, yMax);
+      const rect = { x, y, w, h };
+      if (!placed.some(p => rectsOverlap(rect, p, 25))) {
+        placed.push(rect);
+        return { x, y };
+      }
+    }
+    // Fallback: just use the last attempted position
+    const x = randInt(xMin, xMax);
+    const y = randInt(yMin, yMax);
+    placed.push({ x, y, w, h });
+    return { x, y };
+  }
 
-  <!-- Back to Top -->
-  <button class="back-to-top" id="backToTop" aria-label="回到頂部">↑</button>
+  // 兩朵花需要保持足夠距離（中心距 >= 300px）
+  const MIN_FLOWER_DIST = 300;
+  let pink, red;
+  for (let attempt = 0; attempt < 50; attempt++) {
+    // 每次從頭試，不保留上次失敗的佔位
+    const savedLen = placed.length;
+    pink = placeItem(FLOWER_W, FLOWER_H);
+    red  = placeItem(FLOWER_W, FLOWER_H);
+    const dx = (pink.x + FLOWER_W/2) - (red.x + FLOWER_W/2);
+    const dy = (pink.y + FLOWER_H/2) - (red.y + FLOWER_H/2);
+    if (Math.hypot(dx, dy) >= MIN_FLOWER_DIST) break;
+    // 距離不足，移除這兩筆佔位再重試
+    placed.splice(savedLen, placed.length - savedLen);
+  }
+  const berry      = placeItem(60, 60);
+  const mangosteen = placeItem(60, 60);
+  const scallion   = placeItem(55, 55);
+  const pepper     = placeItem(55, 55);
+  const dragonfly  = placeItem(72, 72);
+  const bird        = placeItem(70, 70);
 
-  <script src="script.js"></script>
+  return { pink, red, berry, mangosteen, scallion, pepper, dragonfly, bird };
+}
+
+/**
+ * Apply positions to DOM elements.
+ */
+function applyPositions(pos) {
+  flowerPos.pink = pos.pink;
+  flowerPos.red  = pos.red;
+
+  fpink.style.left = pos.pink.x + 'px';
+  fpink.style.top  = pos.pink.y + 'px';
+  fred.style.left  = pos.red.x  + 'px';
+  fred.style.top   = pos.red.y  + 'px';
+
+  // Position OK images slightly above/centered on flowers
+  okPink.style.left = (pos.pink.x + 15) + 'px';
+  okPink.style.top  = (pos.pink.y - 30) + 'px';
+  okRed.style.left  = (pos.red.x + 15) + 'px';
+  okRed.style.top   = (pos.red.y - 30) + 'px';
+
+  const items = ['berry', 'mangosteen', 'scallion', 'pepper', 'dragonfly', 'bird'];
+  items.forEach(id => {
+    const el = document.getElementById(id);
+    el.style.left = pos[id].x + 'px';
+    el.style.top  = pos[id].y + 'px';
+    itemPos[id] = pos[id];
+  });
+}
+
+/* =========================================================
+   SOUND
+   ========================================================= */
+function playSound(name) {
+  const map = {
+    click: 'snd-click',
+    error: 'snd-error',
+    right: 'snd-right',
+    win:   'snd-win'
+  };
+  const el = document.getElementById(map[name]);
+  if (!el) return;
+  el.currentTime = 0;
+  el.play().catch(() => {});
+}
+
+/* =========================================================
+   SPEED SYSTEM
+   ========================================================= */
+function setSpeed(mult) {
+  speedMult = mult;
+
+  if (speedTimer) clearTimeout(speedTimer);
+
+  if (mult !== SPEED_NORMAL) {
+    speedTimer = setTimeout(() => {
+      speedMult = SPEED_NORMAL;
+      speedTimer = null;
+    }, SPEED_DURATION);
+  }
+}
+
+/* =========================================================
+   RENDER BEE
+   ========================================================= */
+function renderBee() {
+  beeWrap.style.left = bx + 'px';
+  beeWrap.style.top  = by + 'px';
+}
+
+/* =========================================================
+   MOVE
+   ========================================================= */
+function move(dx, dy) {
+  if (won) return;
+
+  // Flip bee horizontally when moving left
+  if (dx < 0) beeImg.style.transform = 'scaleX(-1)';
+  if (dx > 0) beeImg.style.transform = 'scaleX(1)';
+
+  const step = Math.round(BASE_STEP * speedMult);
+  bx = Math.max(0, Math.min(GW - BEES, bx + dx * step));
+  by = Math.max(0, Math.min(GH - BEES - 10, by + dy * step));
+
+  beeWrap.style.left = bx + 'px';
+  beeWrap.style.top  = by + 'px';
+
+  checkCollision();
+}
+
+/* =========================================================
+   COLLISION
+   ========================================================= */
+function dist(ax, ay, bx2, by2) {
+  return Math.hypot(ax - bx2, ay - by2);
+}
+
+function beeCX() { return bx + BEES / 2; }
+function beeCY() { return by + BEES / 2; }
+
+// Get the centre of an item from its stored position + size
+function itemCX(id, w) { return itemPos[id].x + w / 2; }
+function itemCY(id, h) { return itemPos[id].y + h / 2; }
+
+function checkCollision() {
+  const cx = beeCX(), cy = beeCY();
+
+  // ── 花朵碰撞 ──
+  if (!flowerVisited.pink &&
+      dist(cx, cy, flowerPos.pink.x + FLOWER_W/2, flowerPos.pink.y + FLOWER_H/2) < HIT_R) {
+    visitFlower('pink'); return;
+  }
+  if (!flowerVisited.red &&
+      dist(cx, cy, flowerPos.red.x + FLOWER_W/2, flowerPos.red.y + FLOWER_H/2) < HIT_R) {
+    visitFlower('red'); return;
+  }
+
+  // ── 速度加成：berry / mangosteen ──
+  const speedBoostItems = [
+    { id: 'berry',      w: 60, h: 60 },
+    { id: 'mangosteen', w: 60, h: 60 },
+  ];
+  for (const item of speedBoostItems) {
+    if (!itemPos[item.id]) continue;
+    if (dist(cx, cy, itemCX(item.id, item.w), itemCY(item.id, item.h)) < ANIMAL_HIT_R) {
+      if (speedMult !== SPEED_FAST) setSpeed(SPEED_FAST);
+      return;
+    }
+  }
+
+  // ── 速度懲罰：scallion / pepper ──
+  const speedSlowItems = [
+    { id: 'scallion', w: 55, h: 55 },
+    { id: 'pepper',   w: 55, h: 55 },
+  ];
+  for (const item of speedSlowItems) {
+    if (!itemPos[item.id]) continue;
+    if (dist(cx, cy, itemCX(item.id, item.w), itemCY(item.id, item.h)) < ANIMAL_HIT_R) {
+      if (speedMult !== SPEED_SLOW) setSpeed(SPEED_SLOW);
+      return;
+    }
+  }
+
+  // ── 障礙碰撞：dragonfly / bird → 送回原點 ──
+  const obstacles = [
+    { id: 'dragonfly', w: 72, h: 72 },
+    { id: 'bird',      w: 70, h: 70 },
+  ];
+  for (const obs of obstacles) {
+    if (!itemPos[obs.id]) continue;
+    const ocx = itemCX(obs.id, obs.w);
+    const ocy = itemCY(obs.id, obs.h);
+    if (dist(cx, cy, ocx, ocy) < ANIMAL_HIT_R && !errorCooldown) {
+      playSound('error');
+      errorCooldown = true;
+      resetBeeToStart();
+      setTimeout(() => { errorCooldown = false; }, 1200);
+      break;
+    }
+  }
+}
+
+function resetBeeToStart() {
+  bx = BEE_START_X;
+  by = BEE_START_Y;
+  beeWrap.style.left = bx + 'px';
+  beeWrap.style.top  = by + 'px';
+  beeImg.style.transform = 'scaleX(1)';
+
+  // Flash animation
+  let flashes = 0;
+  const flashTimer = setInterval(() => {
+    beeWrap.style.opacity = flashes % 2 === 0 ? '0.2' : '1';
+    flashes++;
+    if (flashes >= 8) {
+      clearInterval(flashTimer);
+      beeWrap.style.opacity = '1';
+    }
+  }, 120);
+}
+
+/* 授粉某朵花 */
+function visitFlower(flower) {
+  flowerVisited[flower] = true;
+  playSound('right');
+
+  const el = flower === 'pink' ? fpink : fred;
+  const ok = flower === 'pink' ? okPink : okRed;
+  
+  el.classList.remove('pollinated');
+  void el.offsetWidth;
+  el.classList.add('pollinated');
+  
+  // 顯示 OK 圖片
+  ok.style.display = 'block';
+
+  setTimeout(() => {
+    el.classList.remove('pollinated');
+    el.style.filter = 'brightness(0.65) saturate(0.4)';
+  }, 500);
+
+  if (flowerVisited.pink && flowerVisited.red) {
+    setTimeout(() => triggerWin(), 600);
+  }
+}
+
+function triggerWin() {
+  won = true;
+  playSound('win');
+  winMsg.textContent = '太厲害了！兩朵花都授粉完成！🌻';
+  winEl.style.display = 'flex';
+}
+
+function restart() {
+  bx = BEE_START_X;
+  by = BEE_START_Y;
+  flowerVisited = { pink: false, red: false };
+  won           = false;
+  errorCooldown = false;
+
+  // Reset speed
+  if (speedTimer) { clearTimeout(speedTimer); speedTimer = null; }
+  speedMult = SPEED_NORMAL;
+
+  beeImg.style.transform = 'scaleX(1)';
+  fpink.style.filter = '';
+  fred.style.filter  = '';
+  okPink.style.display = 'none';
+  okRed.style.display = 'none';
+  winEl.style.display = 'none';
+
+  beeWrap.style.left = bx + 'px';
+  beeWrap.style.top  = by + 'px';
+
+  // Re-randomize positions every restart
+  applyPositions(randomizePositions());
+}
+
+/* =========================================================
+   KEYBOARD
+   ========================================================= */
+const held = {};
+document.addEventListener('keydown', e => {
+  if (!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) return;
+  e.preventDefault();
+  if (!held[e.key]) playSound('click');
+  held[e.key] = true;
+});
+document.addEventListener('keyup', e => { held[e.key] = false; });
+
+// continuous movement loop
+setInterval(() => {
+  if (won) return;
+  if (held['ArrowUp'])    move( 0,-1);
+  if (held['ArrowDown'])  move( 0, 1);
+  if (held['ArrowLeft'])  move(-1, 0);
+  if (held['ArrowRight']) move( 1, 0);
+}, 60);
+
+/* =========================================================
+   INIT
+   ========================================================= */
+beeWrap.style.left      = bx + 'px';
+beeWrap.style.top       = by + 'px';
+beeWrap.style.transform = '';
+
+// Initial random placement
+applyPositions(randomizePositions());
+</script>
 </body>
 </html>
